@@ -32,6 +32,9 @@ d3.json("data/samples.json").then((data) => {
     // Render dropdown (sample names)
     renderDrowpdown(names);
 
+    // Default init()
+    dropdown.property('value', 945);   // Default value for plot
+
 })
 
 
@@ -45,3 +48,15 @@ function renderDrowpdown(names) {
 }
 
 
+// CHANGE OPTION FUNCTION
+function optionChanged() {
+
+    // Q2: Default refresh is form-behaviour only??
+    // Prevent the page from refreshing
+    // d3.event.preventDefault();
+
+    // Get input values (from elements)
+    var name = dropdown.property('value');
+
+    console.log(`Option changed: ${name}`);   //DEBUG
+}
