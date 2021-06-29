@@ -1,6 +1,7 @@
 
 // Q0: Uncaught SyntaxError: Unexpected token ':'
-
+// init() sequence
+// sort() sequence
 
 // UNPACK FUNCTION
 function unpack(rows, index) {
@@ -43,10 +44,20 @@ d3.json("data/samples.json").then((data) => {
     var defaultName = 940;
     dropdown.property('value', defaultName);   // Default value for plot
 
-    // 
+
+    // RENDER METADATA
+    // function renderMEtadata (sampleName) {}
+    var defaultMetadata = metadata.find(metadata => metadata.id === defaultName);
+    console.log("Metadata: ");
+    console.log(defaultMetadata);
+
+    for (const [key, value] of Object.entries(defaultMetadata)) {
+        demographicInfo.append('div').text(`${key.toUpperCase()}: ${value}`);
+    }
+
+
 
     // HORIZONTAL BAR CHART
-
     var defaultSample = samples.find(sample => parseInt(sample.id) === defaultName);
     console.log("Default sample: ");
     console.log(defaultSample);
@@ -59,29 +70,41 @@ d3.json("data/samples.json").then((data) => {
     console.log("Top 10 values: ");
     console.log(topValues);
 
-    topIds = [];
-    topLabels = [];
+    var sampleArr = [];
+    var sampleDict = {};
 
-    // defaultSample.find(row => row.sample_values === topValues[0]);
+    for (var i = 0; i < defaultSample.sample_values.length; i++) {
+        sampleDict["id"] = defaultName;
+        sampleDict["sample_value"] = defaultSample.sample_values[i];
+        sampleDict["otu_id"] = String(defaultSample.otu_ids[i]);
+        sampleDict["otu_label"] = defaultSample.otu_labels[i];
+        sampleArr.push(sampleDict);
+        sampleDict = {};
+    }
 
-    // for (var i = 1; i < topValues.length; i++) {
-    //     topIds.push(defaultSample.find(row.sample_values === topValues[i]));
-    // }
-    // var topIds = defaultSample.find(row => row.sample_values === topValue)
-    // var topLabels = 
-
-    // console.log(topIds);
+    console.log("Sample Array: ");
+    console.log(sampleArr.slice(0, 10));
 
 
-    var defaultMetadata = metadata.find(metadata => metadata.id === defaultName);
-    
-    console.log("Metadata: ");
-    console.log(defaultMetadata);
-    
+    var data = {
+        x: defaultSample.sample_values.slice(0, 10).reverse(),
+        y: defaultSample.otu_ids.slice(0, 10).map(row => `OTU ${String(row)}`).reverse(),
+        type: 'bar',
+        orientation: 'h',
+        text: defaultSample.otu_labels.slice(0, 10)
+    };
 
-    for (const [key, value] of Object.entries(defaultMetadata)) {
-        demographicInfo.append('div').text(`${key.toUpperCase()}: ${value}`);
-      }
+    var layout = {
+        title: "Top 10 Bacteria Cultures Found"
+    };
+
+
+    Plotly.newPlot('bar', [data], layout);
+
+
+    // var otu = 
+    // console.log(otu);
+
 
 
 
