@@ -74,7 +74,7 @@ d3.json("data/samples.json").then((data) => {
 
     
     // HORIZONTAL BAR CHART
-    var data = {
+    var trace1 = {
         x: sample_values.slice(0, 10).reverse(),
         y: otu_ids.slice(0, 10).map((row) => `OTU ${String(row)}`).reverse(),
         type: 'bar',
@@ -86,9 +86,30 @@ d3.json("data/samples.json").then((data) => {
         title: "Top 10 Bacteria Cultures Found"
     };
 
-    Plotly.newPlot('bar', [data], layout);
+    Plotly.newPlot('bar', [trace1], layout);
 
-    // 
+
+    // DEBUG
+    console.log(otu_ids.map((item) => `#${item}`));
+
+    // BUBBLE CHART
+    var trace2 = {
+        x: otu_ids,
+        y: sample_values,
+        mode: 'markers',
+        marker: {
+            size: sample_values,
+            color: otu_ids.map((item) => `#${item}`)
+        }
+    };
+
+    var layout = {
+        title: "Bacteria Cultures Per Sample",
+        xaxis: {title: "OTU ID"},
+        showlegend: false
+    };
+
+    Plotly.newPlot('bubble', [trace2], layout);
 
 
 })
@@ -113,7 +134,9 @@ function renderDrowpdown(names) {
 function renderMetadata(sampleMetadata) {
     demographicInfo.html("");
     for (const [key, value] of Object.entries(sampleMetadata)) {
-        demographicInfo.append('p').text(`${key.toUpperCase()}: ${value}`);
+        demographicInfo.append('p').text(`${key.toUpperCase()}: ${value}`)
+                                   .style('font-size', '11.5px')
+                                   .style('font-weight', 'bold');
     }
 }
 
