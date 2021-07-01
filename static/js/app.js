@@ -31,12 +31,14 @@ d3.json("data/samples.json").then((data) => {
 
     // Get sample metadata
     var defaultMetadata = metadata.find((metadata) => metadata.id === defaultName);
-   
+
     // Render sample metadata
     renderMetadata(defaultMetadata);
 
     // Get sample data
     var defaultSample = samples.find((sample) => parseInt(sample.id) === defaultName);
+
+     // DEBUG
     console.log("Default sample: ");
     console.log(defaultSample);
 
@@ -55,11 +57,11 @@ d3.json("data/samples.json").then((data) => {
         sampleArr.push(sampleDict);
         sampleDict = {};
     }
-    
+
     // DEBUG
     console.log("Sample Array: ");
     console.log(sampleArr.slice(0, 10));
-    
+
     // Sort data collection
     var sortedArr = sampleArr.sort(sortDesc);
 
@@ -72,7 +74,7 @@ d3.json("data/samples.json").then((data) => {
     otu_ids = sortedArr.map((row) => row.otu_id);
     otu_labels = sortedArr.map((row) => row.otu_label);
 
-    
+
     // HORIZONTAL BAR CHART
     var trace1 = {
         x: sample_values.slice(0, 10).reverse(),
@@ -105,7 +107,7 @@ d3.json("data/samples.json").then((data) => {
 
     var layout = {
         title: "Bacteria Cultures Per Sample",
-        xaxis: {title: "OTU ID"},
+        xaxis: { title: "OTU ID" },
         showlegend: false
     };
 
@@ -135,8 +137,8 @@ function renderMetadata(sampleMetadata) {
     demographicInfo.html("");
     for (const [key, value] of Object.entries(sampleMetadata)) {
         demographicInfo.append('p').text(`${key.toUpperCase()}: ${value}`)
-                                   .style('font-size', '11.5px')
-                                   .style('font-weight', 'bold');
+            .style('font-size', '11.5px')
+            .style('font-weight', 'bold');
     }
 }
 
@@ -171,6 +173,41 @@ function optionChanged() {
         // Render metadata
         renderMetadata(selectedMetadata);
 
+        // Get sample data
+        var selectedSample = samples.find((sample) => parseInt(sample.id) === name);
+ 
+        // SORT SAMPLE DATA
+        // Set initial values
+        var sampleArr = [];
+        var sampleDict = {};
+
+        // Build data collection
+        for (var i = 0; i < selectedSample.sample_values.length; i++) {
+            sampleDict["id"] = name;
+            sampleDict["sample_value"] = selectedSample.sample_values[i];
+            sampleDict["otu_id"] = String(selectedSample.otu_ids[i]);
+            sampleDict["otu_label"] = selectedSample.otu_labels[i];
+            sampleArr.push(sampleDict);
+            sampleDict = {};
+        }
+
+        // Sort data collection
+        var sortedArr = sampleArr.sort(sortDesc);
+
+        // Build data arrays
+        sample_values = sortedArr.map((row) => row.sample_value);
+        otu_ids = sortedArr.map((row) => row.otu_id);
+        otu_labels = sortedArr.map((row) => row.otu_label);
+
+
+        // RESTYLE BAR CHART
+        var x = sample_values.slice(0, 10).reverse();
+        var y = otu_ids.slice(0, 10).map((row) => `OTU ${String(row)}`).reverse();
+        var text = otu_labels.slice(0, 10);
+
+        Plotly.restyle('bar', 'x', [x]);
+        Plotly.restyle('bar', 'y', [y]);
+        Plotly.restyle('bar', 'text', [text]);
 
     });
 
