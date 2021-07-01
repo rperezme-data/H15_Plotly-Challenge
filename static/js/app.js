@@ -1,23 +1,6 @@
-
-// Q0: Uncaught SyntaxError: Unexpected token ':'
-// init() sequence
-// sort() sequence
-
-// UNPACK FUNCTION
-function unpack(rows, index) {
-    return rows.map(function (row) {
-        return row[index];
-    });
-}
-
-
-// SELECT ELEMENTS (dropdown)
+// SELECT ELEMENTS
 var dropdown = d3.select("#selDataset");
-var demographicInfo = d3.select("#sample-metadata")
-
-// Q1: HTML inline handling??
-// HANDLE ELEMENTS (dropdown)
-// dropdown.on('change', optionChanged);
+var demographicInfo = d3.select("#sample-metadata");
 
 
 // LOAD DATA
@@ -25,67 +8,36 @@ var demographicInfo = d3.select("#sample-metadata")
 d3.json("data/samples.json").then((data) => {
 
     // Assign data to variables
-    var names = data.names;
-    // var names = data.names.map((row) => parseInt(row));
+    var names = data.names.map((row) => parseInt(row));
     var metadata = data.metadata;
     var samples = data.samples;
-
-    // DEBUG
-    console.log(data);
-    console.log(names);
-    console.log(metadata);
-    console.log(samples);
 
     // Render dropdown (sample names)
     renderDrowpdown(names);
 
-    // Default init()
-    console.log(Math.min(names));   // Q3: What??
+    // SET DEFAULT VALUE
+    // DEBUG
+    console.log("Sample Range (min/max): ");
+    console.log(Math.min(...names), Math.max(...names));
+
+    // Default value for initial dashboard metadata & plots
     var defaultName = 940;
-    dropdown.property('value', defaultName);   // Default value for plot
 
+    // Set dropdown default value
+    dropdown.property('value', defaultName);
 
-    // RENDER METADATA
-    // function renderMEtadata (sampleName) {}
+    // Get sample metadata
     var defaultMetadata = metadata.find(metadata => metadata.id === defaultName);
-    console.log("Metadata: ");
-    console.log(defaultMetadata);
+    // Render sample metadata
+    renderMetadata(defaultMetadata);
 
-    for (const [key, value] of Object.entries(defaultMetadata)) {
-        demographicInfo.append('div').text(`${key.toUpperCase()}: ${value}`);
-    }
-
-
-
-    // HORIZONTAL BAR CHART
+    // Get sample data
     var defaultSample = samples.find(sample => parseInt(sample.id) === defaultName);
     console.log("Default sample: ");
     console.log(defaultSample);
 
-    function sortDesc(a, b) {
-        return b - a;
-    }
 
-    var topValues = defaultSample.sample_values.sort(sortDesc).slice(0, 10);
-    console.log("Top 10 values: ");
-    console.log(topValues);
-
-    var sampleArr = [];
-    var sampleDict = {};
-
-    for (var i = 0; i < defaultSample.sample_values.length; i++) {
-        sampleDict["id"] = defaultName;
-        sampleDict["sample_value"] = defaultSample.sample_values[i];
-        sampleDict["otu_id"] = String(defaultSample.otu_ids[i]);
-        sampleDict["otu_label"] = defaultSample.otu_labels[i];
-        sampleArr.push(sampleDict);
-        sampleDict = {};
-    }
-
-    console.log("Sample Array: ");
-    console.log(sampleArr.slice(0, 10));
-
-
+    // HORIZONTAL BAR CHART
     var data = {
         x: defaultSample.sample_values.slice(0, 10).reverse(),
         y: defaultSample.otu_ids.slice(0, 10).map(row => `OTU ${String(row)}`).reverse(),
@@ -98,15 +50,7 @@ d3.json("data/samples.json").then((data) => {
         title: "Top 10 Bacteria Cultures Found"
     };
 
-
     Plotly.newPlot('bar', [data], layout);
-
-
-    // var otu = 
-    // console.log(otu);
-
-
-
 
 })
 
@@ -121,15 +65,49 @@ function renderDrowpdown(names) {
 }
 
 
+// RENDER METADATA FUNCTION
+// Pending: d3.remove
+function renderMetadata(sampleMetadata) {
+    demographicInfo.html("");
+    for (const [key, value] of Object.entries(sampleMetadata)) {
+        demographicInfo.append('p').text(`${key.toUpperCase()}: ${value}`);
+    }
+}
+
+
+// SORT SAMPLE DATA FUNCTIONS (by sample_value)
+// Ascending
+function sortDesc(a, b) {
+    return b.sample_value - a.sample_value;
+}
+
+// Descending
+function sortAsc(a, b) {
+    return a.sample_value - b.sample_value;
+}
+
+
 // CHANGE OPTION FUNCTION
 function optionChanged() {
 
-    // Q2: Default refresh is form-behaviour only??
-    // Prevent the page from refreshing
-    // d3.event.preventDefault();
-
     // Get input values (from elements)
-    var name = dropdown.property('value');
+    var name = parseInt(dropdown.property('value'));
 
-    console.log(`Option changed: ${name}`);   //DEBUG
+    // LOAD DATA
+    d3.json("data/samples.json").then((data) => {
+
+        // Assign data to variables
+        var metadata = data.metadata;
+        var samples = data.samples;
+
+        // Get selected sample metadata
+        var selectedMetadata = metadata.find(metadata => metadata.id === name);
+        // Render metadata
+        renderMetadata(selectedMetadata);
+
+
+    });
+
 }
+
+console.log("Script successfully read");
