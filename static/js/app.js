@@ -16,6 +16,7 @@ d3.json("data/samples.json").then((data) => {
     renderDrowpdown(names);
 
     // SET DEFAULT VALUE
+
     // DEBUG
     console.log("Sample Range (min/max): ");
     console.log(Math.min(...names), Math.max(...names));
@@ -26,24 +27,59 @@ d3.json("data/samples.json").then((data) => {
     // Set dropdown default value
     dropdown.property('value', defaultName);
 
+    // Pending: GET PLOT DATA FUNCTION
+
     // Get sample metadata
-    var defaultMetadata = metadata.find(metadata => metadata.id === defaultName);
+    var defaultMetadata = metadata.find((metadata) => metadata.id === defaultName);
+   
     // Render sample metadata
     renderMetadata(defaultMetadata);
 
     // Get sample data
-    var defaultSample = samples.find(sample => parseInt(sample.id) === defaultName);
+    var defaultSample = samples.find((sample) => parseInt(sample.id) === defaultName);
     console.log("Default sample: ");
     console.log(defaultSample);
 
 
+    // SORT SAMPLE DATA
+    // Set initial values
+    var sampleArr = [];
+    var sampleDict = {};
+
+    // Build data collection
+    for (var i = 0; i < defaultSample.sample_values.length; i++) {
+        sampleDict["id"] = defaultName;
+        sampleDict["sample_value"] = defaultSample.sample_values[i];
+        sampleDict["otu_id"] = String(defaultSample.otu_ids[i]);
+        sampleDict["otu_label"] = defaultSample.otu_labels[i];
+        sampleArr.push(sampleDict);
+        sampleDict = {};
+    }
+    
+    // DEBUG
+    console.log("Sample Array: ");
+    console.log(sampleArr.slice(0, 10));
+    
+    // Sort data collection
+    var sortedArr = sampleArr.sort(sortDesc);
+
+    // DEBUG
+    console.log("Sorted Array: ");
+    console.log(sortedArr.slice(0, 10));
+
+    // Pending: plotData .sample_values .otu_ids .otu_labels
+    sample_values = sortedArr.map((row) => row.sample_value);
+    otu_ids = sortedArr.map((row) => row.otu_id);
+    otu_labels = sortedArr.map((row) => row.otu_label);
+
+    
     // HORIZONTAL BAR CHART
     var data = {
-        x: defaultSample.sample_values.slice(0, 10).reverse(),
-        y: defaultSample.otu_ids.slice(0, 10).map(row => `OTU ${String(row)}`).reverse(),
+        x: sample_values.slice(0, 10).reverse(),
+        y: otu_ids.slice(0, 10).map((row) => `OTU ${String(row)}`).reverse(),
         type: 'bar',
         orientation: 'h',
-        text: defaultSample.otu_labels.slice(0, 10)
+        text: otu_labels.slice(0, 10)
     };
 
     var layout = {
@@ -52,16 +88,23 @@ d3.json("data/samples.json").then((data) => {
 
     Plotly.newPlot('bar', [data], layout);
 
+    // 
+
+
 })
 
 
 // RENDER DROPDOWN FUNCTION
+// Pending: first.option
 function renderDrowpdown(names) {
     // Render dropdown options
-    names.forEach(name => {
+    names.forEach((name) => {
         dropdown.append('option').text(name);
-        console.log(`Rendered dropdown`);   //DEBUG
     });
+
+    //DEBUG
+    console.log("Rendered dropdown");
+    console.log(names);
 }
 
 
@@ -101,7 +144,7 @@ function optionChanged() {
         var samples = data.samples;
 
         // Get selected sample metadata
-        var selectedMetadata = metadata.find(metadata => metadata.id === name);
+        var selectedMetadata = metadata.find((metadata) => metadata.id === name);
         // Render metadata
         renderMetadata(selectedMetadata);
 
