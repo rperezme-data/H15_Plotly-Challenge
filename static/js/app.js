@@ -27,7 +27,7 @@ d3.json("data/samples.json").then((data) => {
     // Set dropdown default value
     dropdown.property('value', defaultName);
 
-    // Pending: GET PLOT DATA FUNCTION
+    // Pending: GET DASHBOARD DATA FUNCTION
 
     // Get sample metadata
     var defaultMetadata = metadata.find((metadata) => metadata.id === defaultName);
@@ -38,7 +38,7 @@ d3.json("data/samples.json").then((data) => {
     // Get sample data
     var defaultSample = samples.find((sample) => parseInt(sample.id) === defaultName);
 
-     // DEBUG
+    // DEBUG
     console.log("Default sample: ");
     console.log(defaultSample);
 
@@ -69,7 +69,7 @@ d3.json("data/samples.json").then((data) => {
     console.log("Sorted Array: ");
     console.log(sortedArr.slice(0, 10));
 
-    // Pending: plotData .sample_values .otu_ids .otu_labels
+    // Solved: plotData .sample_values .otu_ids .otu_labels
     sample_values = sortedArr.map((row) => row.sample_value);
     otu_ids = sortedArr.map((row) => row.otu_id);
     otu_labels = sortedArr.map((row) => row.otu_label);
@@ -77,15 +77,17 @@ d3.json("data/samples.json").then((data) => {
 
     // HORIZONTAL BAR CHART
     var trace1 = {
-        x: sample_values.slice(0, 10).reverse(),
-        y: otu_ids.slice(0, 10).map((row) => `OTU ${String(row)}`).reverse(),
         type: 'bar',
         orientation: 'h',
+        x: sample_values.slice(0, 10).reverse(),
+        y: otu_ids.slice(0, 10).map((row) => `OTU ${String(row)}`).reverse(),
         text: otu_labels.slice(0, 10)
     };
 
     var layout = {
-        title: "Top 10 Bacteria Cultures Found"
+        title: "Top 10 Bacteria Cultures Found",
+        xaxis: { title: "Sample Values" },
+        // yaxis: { title: "Operational Taxonomic Unit" }
     };
 
     Plotly.newPlot('bar', [trace1], layout);
@@ -98,16 +100,19 @@ d3.json("data/samples.json").then((data) => {
     var trace2 = {
         x: otu_ids,
         y: sample_values,
+        text: otu_labels,
         mode: 'markers',
         marker: {
             size: sample_values,
+            // color: otu_ids
             color: otu_ids.map((item) => `#${item}`)
         }
     };
 
     var layout = {
         title: "Bacteria Cultures Per Sample",
-        xaxis: { title: "OTU ID" },
+        xaxis: { title: "Operational Taxonomic Unit (OTU) ID" },
+        yaxis: { title: "Sample Values" },
         showlegend: false
     };
 
@@ -175,7 +180,7 @@ function optionChanged() {
 
         // Get sample data
         var selectedSample = samples.find((sample) => parseInt(sample.id) === name);
- 
+
         // SORT SAMPLE DATA
         // Set initial values
         var sampleArr = [];
@@ -208,6 +213,29 @@ function optionChanged() {
         Plotly.restyle('bar', 'x', [x]);
         Plotly.restyle('bar', 'y', [y]);
         Plotly.restyle('bar', 'text', [text]);
+
+
+        // RESTYLE BUBBLE CHART
+        x = otu_ids;
+        y = sample_values;
+        var markerSize = sample_values;
+        var markerColor = otu_ids.map((item) => `#${item}`);
+
+        Plotly.restyle('bubble', 'x', [x]);
+        Plotly.restyle('bubble', 'y', [y]);
+        
+        // Pending: restyle
+        Plotly.restyle('bubble', 'marker.size', [markerSize]);
+        Plotly.restyle('bubble', 'marker.color', [markerColor]);
+
+        // var update = {
+        //     'marker.size': [markerSize],
+        //     'marker.color': [markerColor]
+        // }
+
+        // Plotly.restyle('bubble', update);
+
+
 
     });
 
