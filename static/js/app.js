@@ -17,9 +17,7 @@ d3.json("data/samples.json").then((data) => {
 
     // SET DEFAULT VALUE
 
-    // DEBUG
-    console.log("Sample Range (min/max): ");
-    console.log(Math.min(...names), Math.max(...names));
+    console.log("Sample Range (min/max): ", Math.min(...names), Math.max(...names));   // DEBUG
 
     // Default value for initial dashboard metadata & plots
     var defaultName = 940;
@@ -38,10 +36,7 @@ d3.json("data/samples.json").then((data) => {
     // Get sample data
     var defaultSample = samples.find((sample) => parseInt(sample.id) === defaultName);
 
-    // DEBUG
-    console.log("Default sample: ");
-    console.log(defaultSample);
-
+    console.log("Default sample: ", defaultSample);   // DEBUG
 
     // SORT SAMPLE DATA
     // Set initial values
@@ -58,16 +53,12 @@ d3.json("data/samples.json").then((data) => {
         sampleDict = {};
     }
 
-    // DEBUG
-    console.log("Sample Array: ");
-    console.log(sampleArr.slice(0, 10));
+    console.log("Sample Array: ", sampleArr.slice(0, 10));   // DEBUG
 
     // Sort data collection
     var sortedArr = sampleArr.sort(sortDesc);
 
-    // DEBUG
-    console.log("Sorted Array: ");
-    console.log(sortedArr.slice(0, 10));
+    console.log("Sorted Array: ", sortedArr.slice(0, 10));   // DEBUG
 
     // Solved: plotData .sample_values .otu_ids .otu_labels
     sample_values = sortedArr.map((row) => row.sample_value);
@@ -94,18 +85,20 @@ d3.json("data/samples.json").then((data) => {
 
 
     // DEBUG
-    console.log(otu_ids.map((item) => `#${item}`));
+    console.log("Marker Size: ", sample_values);
+    console.log("Marker Color: ", otu_ids.map((item) => `#${item}`));
+
 
     // BUBBLE CHART
     var trace2 = {
+        mode: 'markers',
         x: otu_ids,
         y: sample_values,
         text: otu_labels,
-        mode: 'markers',
         marker: {
             size: sample_values,
-            // color: otu_ids
-            color: otu_ids.map((item) => `#${item}`)
+            color: otu_ids.map((item) => `#${item}`),   // Pending: color
+            
         }
     };
 
@@ -119,6 +112,39 @@ d3.json("data/samples.json").then((data) => {
     Plotly.newPlot('bubble', [trace2], layout);
 
 
+    // GAUGE CHART
+    var trace3 = {
+
+        type: "indicator",
+        mode: "gauge+number",
+        title: "Scrubs per Week",
+
+        value: defaultMetadata.wfreq,
+
+        gauge: {
+
+            axis: {
+                range: [0, 9],
+                tickmode: 'array',
+                tickvals: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            },
+
+            threshold: {
+                line: { color: "royalblue", width: 4 },
+                thickness: 0.75,
+                value: defaultMetadata.wfreq
+            },
+
+        },
+
+    };
+
+    var layout = { title: "Belly Button Washing Frequency" };
+
+    Plotly.newPlot('gauge', [trace3], layout);
+
+
+
 })
 
 
@@ -130,9 +156,8 @@ function renderDrowpdown(names) {
         dropdown.append('option').text(name);
     });
 
-    //DEBUG
-    console.log("Rendered dropdown");
-    console.log(names);
+    console.log("Rendered dropdown", names);   //DEBUG
+
 }
 
 
@@ -219,21 +244,18 @@ function optionChanged() {
         x = otu_ids;
         y = sample_values;
         var markerSize = sample_values;
-        var markerColor = otu_ids.map((item) => `#${item}`);
+        var markerColor = otu_ids.map((item) => `#${item}`);   // Pending: color
+
+        // DEBUG
+        console.log("Marker Size: ", markerSize);
+        console.log("Marker Color: ", markerColor);
 
         Plotly.restyle('bubble', 'x', [x]);
         Plotly.restyle('bubble', 'y', [y]);
-        
-        // Pending: restyle
         Plotly.restyle('bubble', 'marker.size', [markerSize]);
         Plotly.restyle('bubble', 'marker.color', [markerColor]);
 
-        // var update = {
-        //     'marker.size': [markerSize],
-        //     'marker.color': [markerColor]
-        // }
-
-        // Plotly.restyle('bubble', update);
+        // RESTYLE GAUGE CHART
 
 
 
@@ -241,4 +263,4 @@ function optionChanged() {
 
 }
 
-console.log("Script successfully read");
+console.log("Script successfully read");   // DEBUG
