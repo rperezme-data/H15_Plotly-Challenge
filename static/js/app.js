@@ -1,4 +1,4 @@
-// SELECT ELEMENTS
+// SELECT HTML ELEMENTS
 var dropdown = d3.select("#selDataset");
 var demographicInfo = d3.select("#sample-metadata");
 
@@ -23,7 +23,7 @@ d3.json("data/samples.json").then((data) => {
     var defaultName = 940;
 
     // Set dropdown default value
-    dropdown.property('value', defaultName);
+    // dropdown.property('value', defaultName);
 
     // Pending: GET DASHBOARD DATA FUNCTION
 
@@ -256,6 +256,10 @@ function optionChanged() {
         Plotly.restyle('bubble', 'marker.color', [markerColor]);
 
         // RESTYLE GAUGE CHART
+        var value = selectedMetadata.wfreq;
+        Plotly.restyle('gauge', 'value', value);
+        Plotly.restyle('gauge', 'gauge.threshold.value', value);
+        console.log("Restyle value: ", value);
 
 
 
