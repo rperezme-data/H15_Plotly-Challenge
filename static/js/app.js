@@ -3,7 +3,9 @@ var dropdown = d3.select("#selDataset");
 var demographicInfo = d3.select("#sample-metadata");
 
 
-// LOAD DATA
+// INITIAL FUNCTION
+
+// LOAD, RENDER & PLOT
 // Read JSON dataset using D3 library (samples.json)
 d3.json("data/samples.json").then((data) => {
 
@@ -16,16 +18,8 @@ d3.json("data/samples.json").then((data) => {
     renderDrowpdown(names);
 
     // SET DEFAULT VALUE
-
-    console.log("Sample Range (min/max): ", Math.min(...names), Math.max(...names));   // DEBUG
-
     // Default value for initial dashboard metadata & plots
     var defaultName = 940;
-
-    // Set dropdown default value
-    // dropdown.property('value', defaultName);
-
-    // Pending: GET DASHBOARD DATA FUNCTION
 
     // Get sample metadata
     var defaultMetadata = metadata.find((metadata) => metadata.id === defaultName);
@@ -35,8 +29,6 @@ d3.json("data/samples.json").then((data) => {
 
     // Get sample data
     var defaultSample = samples.find((sample) => parseInt(sample.id) === defaultName);
-
-    console.log("Default sample: ", defaultSample);   // DEBUG
 
     // SORT SAMPLE DATA
     // Set initial values
@@ -53,17 +45,13 @@ d3.json("data/samples.json").then((data) => {
         sampleDict = {};
     }
 
-    console.log("Sample Array: ", sampleArr.slice(0, 10));   // DEBUG
-
     // Sort data collection
     var sortedArr = sampleArr.sort(sortDesc);
 
-    console.log("Sorted Array: ", sortedArr.slice(0, 10));   // DEBUG
-
-    // Solved: plotData .sample_values .otu_ids .otu_labels
-    sample_values = sortedArr.map((row) => row.sample_value);
-    otu_ids = sortedArr.map((row) => row.otu_id);
-    otu_labels = sortedArr.map((row) => row.otu_label);
+    // Build sorted data arrays
+    var sample_values = sortedArr.map((row) => row.sample_value);
+    var otu_ids = sortedArr.map((row) => row.otu_id);
+    var otu_labels = sortedArr.map((row) => row.otu_label);
 
 
     // HORIZONTAL BAR CHART
@@ -78,30 +66,25 @@ d3.json("data/samples.json").then((data) => {
     var layout = {
         title: "Top 10 Bacteria Cultures Found",
         xaxis: { title: "Sample Values" },
-        // yaxis: { title: "Operational Taxonomic Unit" }
     };
 
     Plotly.newPlot('bar', [trace1], layout);
 
 
-    // DEBUG
-    console.log("Marker Size: ", sample_values);
-    console.log("Marker Color: ", otu_ids.map((item) => `#${item}`));
-
-
     // BUBBLE CHART
+
     var trace2 = {
-        mode: 'markers',
         x: otu_ids,
         y: sample_values,
         text: otu_labels,
+        mode: 'markers',
         marker: {
             size: sample_values,
             color: otu_ids,
             colorscale: [
                 [0, 'rgb(0,0,255)'],
                 [0.5, 'rgb(0,255,0)'],
-                [1, 'rgb(255,0,0)'],
+                [1, 'rgb(255,0,0)']
             ]
         }
     };
@@ -117,16 +100,13 @@ d3.json("data/samples.json").then((data) => {
 
 
     // GAUGE CHART
-    var trace3 = {
 
+    var trace3 = {
         type: "indicator",
         mode: "gauge+number",
         title: "Scrubs per Week",
-
         value: defaultMetadata.wfreq,
-
         gauge: {
-
             axis: {
                 range: [0, 9],
                 tickmode: 'array',
@@ -144,13 +124,11 @@ d3.json("data/samples.json").then((data) => {
                 { range: [7, 8], color: "#B8B8B8" },
                 { range: [8, 9], color: "#B0B0B0" }
             ],
-
             threshold: {
                 line: { color: "royalblue", width: 4 },
                 thickness: 0.75,
                 value: defaultMetadata.wfreq
             }
-
         },
     };
 
@@ -158,26 +136,18 @@ d3.json("data/samples.json").then((data) => {
 
     Plotly.newPlot('gauge', [trace3], layout);
 
-
-
 })
 
 
 // RENDER DROPDOWN FUNCTION
-// Pending: first.option
 function renderDrowpdown(names) {
-    // Render dropdown options
     names.forEach((name) => {
         dropdown.append('option').text(name);
     });
-
-    console.log("Rendered dropdown", names);   //DEBUG
-
 }
 
 
 // RENDER METADATA FUNCTION
-// Pending: d3.remove
 function renderMetadata(sampleMetadata) {
     demographicInfo.html("");
     for (const [key, value] of Object.entries(sampleMetadata)) {
@@ -190,14 +160,10 @@ function renderMetadata(sampleMetadata) {
 
 // SORT SAMPLE DATA FUNCTIONS (by sample_value)
 // Ascending
-function sortDesc(a, b) {
-    return b.sample_value - a.sample_value;
-}
-
+function sortDesc(a, b) { return b.sample_value - a.sample_value; }
 // Descending
-function sortAsc(a, b) {
-    return a.sample_value - b.sample_value;
-}
+function sortAsc(a, b) { return a.sample_value - b.sample_value; }
+
 
 
 // CHANGE OPTION FUNCTION
@@ -206,7 +172,7 @@ function optionChanged() {
     // Get input values (from elements)
     var name = parseInt(dropdown.property('value'));
 
-    // LOAD DATA
+    // LOAD, RENDER & RESTYLE
     d3.json("data/samples.json").then((data) => {
 
         // Assign data to variables
@@ -215,6 +181,7 @@ function optionChanged() {
 
         // Get selected sample metadata
         var selectedMetadata = metadata.find((metadata) => metadata.id === name);
+        
         // Render metadata
         renderMetadata(selectedMetadata);
 
@@ -239,10 +206,10 @@ function optionChanged() {
         // Sort data collection
         var sortedArr = sampleArr.sort(sortDesc);
 
-        // Build data arrays
-        sample_values = sortedArr.map((row) => row.sample_value);
-        otu_ids = sortedArr.map((row) => row.otu_id);
-        otu_labels = sortedArr.map((row) => row.otu_label);
+        // Build sorted data arrays
+        var sample_values = sortedArr.map((row) => row.sample_value);
+        var otu_ids = sortedArr.map((row) => row.otu_id);
+        var  otu_labels = sortedArr.map((row) => row.otu_label);
 
 
         // RESTYLE BAR CHART
@@ -256,14 +223,10 @@ function optionChanged() {
 
 
         // RESTYLE BUBBLE CHART
-        x = otu_ids;
-        y = sample_values;
+        var x = otu_ids;
+        var y = sample_values;
         var markerSize = sample_values;
         var markerColor = otu_ids;
-
-        // DEBUG
-        console.log("Marker Size: ", markerSize);
-        console.log("Marker Color: ", markerColor);
 
         Plotly.restyle('bubble', 'x', [x]);
         Plotly.restyle('bubble', 'y', [y]);
@@ -272,11 +235,9 @@ function optionChanged() {
 
         // RESTYLE GAUGE CHART
         var value = selectedMetadata.wfreq;
+
         Plotly.restyle('gauge', 'value', value);
         Plotly.restyle('gauge', 'gauge.threshold.value', value);
-        console.log("Restyle value: ", value);
-
-
 
     });
 
