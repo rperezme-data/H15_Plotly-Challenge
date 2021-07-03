@@ -97,8 +97,12 @@ d3.json("data/samples.json").then((data) => {
         text: otu_labels,
         marker: {
             size: sample_values,
-            color: otu_ids.map((item) => `#${item}`),   // Pending: color
-            
+            color: otu_ids,
+            colorscale: [
+                [0, 'rgb(0,0,255)'],
+                [0.5, 'rgb(0,255,0)'],
+                [1, 'rgb(255,0,0)'],
+            ]
         }
     };
 
@@ -244,7 +248,7 @@ function optionChanged() {
         x = otu_ids;
         y = sample_values;
         var markerSize = sample_values;
-        var markerColor = otu_ids.map((item) => `#${item}`);   // Pending: color
+        var markerColor = otu_ids;
 
         // DEBUG
         console.log("Marker Size: ", markerSize);
