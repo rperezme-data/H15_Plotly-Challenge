@@ -3,8 +3,6 @@ var dropdown = d3.select("#selDataset");
 var demographicInfo = d3.select("#sample-metadata");
 
 
-// INITIAL FUNCTION
-
 // LOAD, RENDER & PLOT
 // Read JSON dataset using D3 library (samples.json)
 d3.json("data/samples.json").then((data) => {
@@ -55,25 +53,33 @@ d3.json("data/samples.json").then((data) => {
 
 
     // HORIZONTAL BAR CHART
-    var trace1 = {
+    var trace = {
         type: 'bar',
         orientation: 'h',
         x: sample_values.slice(0, 10).reverse(),
-        y: otu_ids.slice(0, 10).map((row) => `OTU ${String(row)}`).reverse(),
+        y: otu_ids.slice(0, 10).map((row) => `OTU ${String(row)} `).reverse(),
         text: otu_labels.slice(0, 10)
     };
 
     var layout = {
-        title: "Top 10 Bacteria Cultures Found",
-        xaxis: { title: "Sample Values" },
+        title: {
+            text: "Top 10 Bacteria Cultures Found",
+            font: { size: 20, color: 'black' },
+            y: 0.87
+        },
+        xaxis: {
+            title: {
+                text: "Sample Values",
+                standoff: 15
+            }
+        }
     };
 
-    Plotly.newPlot('bar', [trace1], layout);
+    Plotly.newPlot('bar', [trace], layout);
 
 
     // BUBBLE CHART
-
-    var trace2 = {
+    var trace = {
         x: otu_ids,
         y: sample_values,
         text: otu_labels,
@@ -90,29 +96,40 @@ d3.json("data/samples.json").then((data) => {
     };
 
     var layout = {
-        title: "Bacteria Cultures Per Sample",
-        xaxis: { title: "Operational Taxonomic Unit (OTU) ID" },
+        title: {
+            text: "Bacteria Cultures Per Sample",
+            font: { size: 20, color: 'black' },
+            y: 0.87
+        },
+        xaxis: {
+            title: {
+                text: "Operational Taxonomic Unit (OTU) ID",
+                standoff: 15
+            }
+
+        },
         yaxis: { title: "Sample Values" },
         showlegend: false
     };
 
-    Plotly.newPlot('bubble', [trace2], layout);
+    Plotly.newPlot('bubble', [trace], layout);
 
 
     // GAUGE CHART
-
-    var trace3 = {
-        type: "indicator",
-        mode: "gauge+number",
-        title: "Scrubs per Week",
+    var trace = {
+        type: 'indicator',
+        mode: 'gauge+number',
         value: defaultMetadata.wfreq,
+        title: {
+            text: "Scrubs per Week",
+            font: { size: 18, color: 'dimgrey' },
+        },
         gauge: {
             axis: {
                 range: [0, 9],
-                tickmode: 'array',
-                tickvals: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                dtick: 1
             },
-            bar: { color: "red" },
+            bar: { color: 'red' },
             steps: [
                 { range: [0, 1], color: "#F0F0F0" },
                 { range: [1, 2], color: "#E8E8E8" },
@@ -125,16 +142,22 @@ d3.json("data/samples.json").then((data) => {
                 { range: [8, 9], color: "#B0B0B0" }
             ],
             threshold: {
-                line: { color: "royalblue", width: 4 },
-                thickness: 0.75,
+                line: { color: 'royalblue', width: 4 },
+                thickness: 0.80,
                 value: defaultMetadata.wfreq
             }
         },
     };
 
-    var layout = { title: "Belly Button Washing Frequency" };
+    var layout = {
+        title: {
+            text: "Belly Button Washing Frequency",
+            font: { size: 20, color: 'black' },
+            y: 0.80
+        }
+    };
 
-    Plotly.newPlot('gauge', [trace3], layout);
+    Plotly.newPlot('gauge', [trace], layout);
 
 })
 
@@ -181,7 +204,7 @@ function optionChanged() {
 
         // Get selected sample metadata
         var selectedMetadata = metadata.find((metadata) => metadata.id === name);
-        
+
         // Render metadata
         renderMetadata(selectedMetadata);
 
@@ -209,12 +232,12 @@ function optionChanged() {
         // Build sorted data arrays
         var sample_values = sortedArr.map((row) => row.sample_value);
         var otu_ids = sortedArr.map((row) => row.otu_id);
-        var  otu_labels = sortedArr.map((row) => row.otu_label);
+        var otu_labels = sortedArr.map((row) => row.otu_label);
 
 
         // RESTYLE BAR CHART
         var x = sample_values.slice(0, 10).reverse();
-        var y = otu_ids.slice(0, 10).map((row) => `OTU ${String(row)}`).reverse();
+        var y = otu_ids.slice(0, 10).map((row) => `OTU ${String(row)} `).reverse();
         var text = otu_labels.slice(0, 10);
 
         Plotly.restyle('bar', 'x', [x]);
