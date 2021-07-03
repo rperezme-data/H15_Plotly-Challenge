@@ -132,15 +132,26 @@ d3.json("data/samples.json").then((data) => {
                 tickmode: 'array',
                 tickvals: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
             },
+            bar: { color: "red" },
+            steps: [
+                { range: [0, 1], color: "#F0F0F0" },
+                { range: [1, 2], color: "#E8E8E8" },
+                { range: [2, 3], color: "#E0E0E0" },
+                { range: [3, 4], color: "#D8D8D8" },
+                { range: [4, 5], color: "#D0D0D0" },
+                { range: [5, 6], color: "#C8C8C8" },
+                { range: [6, 7], color: "#C0C0C0" },
+                { range: [7, 8], color: "#B8B8B8" },
+                { range: [8, 9], color: "#B0B0B0" }
+            ],
 
             threshold: {
                 line: { color: "royalblue", width: 4 },
                 thickness: 0.75,
                 value: defaultMetadata.wfreq
-            },
+            }
 
         },
-
     };
 
     var layout = { title: "Belly Button Washing Frequency" };
