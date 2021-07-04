@@ -6,12 +6,20 @@ The scope of this project is to showcase an interactive dashboard to explore the
 
 
 ### Script Summary
-This web application was built using HTML & Bootstrap for the webpage elements and JavaScript, D3 library & Plotly for interactive loading, rendering and plotting data.
+This web application was built using HTML & Bootstrap for the webpage elements and JavaScript, D3 & Plotly for interactive loading, rendering and plotting data.
 
 ### Workflow
 
-1. H
-
+1. Load JSON dataset using D3 library
+2. Render dropdown data (sample names)
+3. Render panel data (default sample metadata)
+4. Plot data (default sample):
+    + Horizontal bar chart
+    + Gauge chart
+    + Bubble chart
+5. Listen dropdown "on-change" option:
+    + Rerender panel (selected sample metadata)
+    + Restyle charts (selected sample)
 
 ### Screenshot
 ![Dashboard_Screenshot](screenshots/dashboard-940.png)
